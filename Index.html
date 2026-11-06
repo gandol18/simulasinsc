@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulasi Angsuran NSC Finance</title>
+<style>
+:root{--bg:#eef0f4;--card:#fff;--tx:#14182b;--mut:#667;--bd:#d9dce5;--red:#b41414;--navy:#1e2746;--row:#f0f3fb;--in:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#1c1f2b;--tx:#eceef5;--mut:#9aa0b4;--bd:#343950;--row:#242838;--in:#12141c}}
+:root[data-theme="dark"]{--bg:#12141c;--card:#1c1f2b;--tx:#eceef5;--mut:#9aa0b4;--bd:#343950;--row:#242838;--in:#12141c}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Roboto,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:20px;grid-template-columns:1fr}
+@media(min-width:760px){.wrap{grid-template-columns:300px 1fr;align-items:start}}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px}
+h2{margin:0 0 12px;font-size:17px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+input[type=text],input[type=number]{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--in);color:var(--tx);font-size:16px}
+.chk{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:14px;color:var(--tx)}
+details{margin-top:14px;font-size:13px;color:var(--mut)}
+details input{margin:2px 0;padding:6px;font-size:14px}
+.frow{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:center}
+.note{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.4}
+.btn{width:100%;margin-top:14px;padding:12px;border:0;border-radius:8px;background:var(--red);color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.6}
+.sheet{background:#f8f9fc;color:#14182b;border-radius:12px;overflow:hidden;border:1px solid var(--bd);width:100%;max-width:480px;margin:0 auto}
+.hd{background:var(--red);color:#fff;text-align:center;padding:26px 10px 24px}
+.hd b{display:block;font-size:26px;letter-spacing:.3px}
+.hd span{display:block;margin-top:14px;font-size:18px;opacity:.92}
+.bd{padding:16px}
+.box{background:#fff;border:2px solid #dcdde2;border-radius:14px;text-align:center;padding:12px 8px}
+.box small{font-size:14px;color:#666;letter-spacing:.3px}
+.box .big{font-size:36px;font-weight:700;color:var(--red);margin-top:2px}
+.cust{margin:16px 4px 0;font-size:16px;line-height:1.5;font-weight:700;font-style:italic}
+.cust div{display:flex;gap:6px;white-space:nowrap}
+.cust .lb{white-space:nowrap}
+.cust b{color:var(--navy);font-size:1em;font-weight:800;font-style:italic}
+.th{display:flex;justify-content:space-between;background:var(--navy);color:#fff;font-weight:600;border-radius:8px;padding:13px 22px;margin:14px 0 10px;font-size:15px}
+.r{display:flex;justify-content:space-between;align-items:center;border:1px solid #dfe3ee;border-radius:10px;padding:10px 12px;gap:8px;white-space:nowrap;font-size:16px;margin-bottom:9px;background:#fff}
+.r:nth-child(odd){background:#f0f3fb}
+.bg{background:var(--red);color:#fff;font-weight:600;border-radius:6px;padding:.4em .55em;font-size:.88em;white-space:nowrap;text-align:center}
+.bg.old{text-decoration:line-through;text-decoration-thickness:2px}
+.tn{display:flex;gap:5px;align-items:center}
+.am{font-size:1.1em;font-weight:600;white-space:nowrap;display:flex;align-items:baseline;gap:.5em}
+.am .od{font-size:.78em;font-weight:400;color:#8a8fa3;text-decoration:line-through}
+.tc{background:#fff;border:1px solid #dcdde2;border-radius:12px;padding:14px 16px;margin-top:16px;font-size:14px;color:#333}
+.tc b{color:var(--navy);font-size:15px}
+.tc ol{margin:8px 0 0;padding-left:22px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h2>Isi Data</h2>
+    <label for="nama">Nama konsumen</label>
+    <input type="text" id="nama" placeholder="mis. Budi Santoso">
+    <label for="motor">Type motor</label>
+    <input type="text" id="motor" placeholder="mis. Honda Vario 125 2022">
+    <label for="cair">Jumlah pencairan (net)</label>
+    <input type="text" id="cair" inputmode="numeric" value="4.000.000">
+    <label class="chk"><input type="checkbox" id="coret"> Coret tenor, ganti tenor −1 bulan</label>
+    <label class="chk"><input type="checkbox" id="tbhcek" checked> Tambah angsuran per bulan</label>
+    <label for="tbh">Nominal tambahan per bulan</label>
+    <input type="text" id="tbh" inputmode="numeric" value="100.000">
+    <label class="chk"><input type="checkbox" id="potcek"> Potongan angsuran (coret angsuran lama)</label>
+    <label for="pot">Nominal potongan per bulan</label>
+    <input type="text" id="pot" inputmode="numeric" value="50.000">
+    <p class="note" id="st"></p>
+    <button class="btn" id="exp">Export JPG</button>
+    <p class="note" id="xm"></p>
+    <p class="note">Angsuran diambil dari tabel brosur NSC (Rp 4.000.000 sampai 25.000.000, kelipatan 500.000). Untuk menyimpan hasil, screenshot bagian brosur.</p>
+  </div>
+  <div class="sheet" id="sheet">
+    <div class="hd"><b>SIMULASI ANGSURAN</b><span>NSC FINANCE</span></div>
+    <div class="bd">
+      <div class="box"><small>JUMLAH PENCAIRAN (NET)</small><div class="big" id="o-cair"></div></div>
+      <div class="cust" id="o-cust"></div>
+      <div class="th"><span>TENOR</span><span>ANGSURAN / BLN</span></div>
+      <div id="rows"></div>
+      <div class="tc"><b>Syarat &amp; Ketentuan:</b>
+        <ol><li>FC KTP Pemohon &amp; Penjamin</li><li>FC Kartu Keluarga</li><li>FC Listrik / PBB</li><li>Slip Gaji / Surat Keterangan Penghasilan</li><li>FC STNK, BPKB, Faktur &amp; Sertifikat Kendaraan</li></ol>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+var tenors=[12,18,24,30,36];
+var T={4000000:[642,487,415,368,361],4500000:[704,533,449,398,392],5000000:[761,574,483,428,396],5500000:[815,613,516,458,425],6000000:[873,654,550,488,453],6500000:[930,696,584,518,482],7000000:[988,737,618,548,510],7500000:[1046,779,651,577,539],8000000:[1109,825,688,610,570],8500000:[1167,867,721,639,599],9000000:[1224,908,754,668,592],9500000:[1282,950,787,696,619],10000000:[1339,991,820,725,646],10500000:[1398,1034,854,755,673],11000000:[1456,1076,889,786,699],11500000:[1515,1119,924,816,726],12000000:[1574,1162,959,847,753],12500000:[1632,1204,994,877,780],13000000:[1691,1247,1028,908,807],13500000:[1750,1290,1063,938,833],14000000:[1808,1332,1098,968,860],14500000:[1867,1375,1133,999,887],15000000:[1943,1430,1178,1038,921],15500000:[2001,1473,1212,1068,948],16000000:[2060,1515,1247,1099,975],16500000:[2119,1558,1282,1129,1002],17000000:[2177,1601,1317,1160,1029],17500000:[2236,1643,1352,1190,1055],18000000:[2295,1686,1386,1221,1082],18500000:[2353,1729,1421,1251,1109],19000000:[2412,1771,1456,1281,1136],19500000:[2470,1814,1491,1312,1163],20000000:[2529,1857,1526,1342,1189],20500000:[2588,1899,1560,1373,1216],21000000:[2646,1942,1595,1403,1243],21500000:[2705,1985,1630,1434,1270],22000000:[2764,2027,1665,1464,1297],22500000:[2822,2070,1700,1494,1323],23000000:[2881,2113,1734,1525,1350],23500000:[2939,2155,1769,1555,1377],24000000:[2998,2198,1804,1586,1404],24500000:[3057,2241,1839,1616,1431],25000000:[3115,2283,1874,1647,1457]};
+var keys=Object.keys(T).map(Number).sort(function(a,b){return a-b});
+function calc(v,i){
+  if(T[v])return T[v][i]*1000;
+  var lo=keys[0],hi=keys[keys.length-1];
+  if(v<lo)return Math.round(T[lo][i]*v/lo)*1000;
+  if(v>hi)return Math.round(T[hi][i]*v/hi)*1000;
+  var a=lo,b=hi,j;
+  for(j=0;j<keys.length-1;j++){if(v>keys[j]&&v<keys[j+1]){a=keys[j];b=keys[j+1];break}}
+  return Math.round(T[a][i]+(T[b][i]-T[a][i])*(v-a)/(b-a))*1000;
+}
+var $=function(i){return document.getElementById(i)};
+function rp(n){return "Rp "+Math.round(n).toLocaleString("id-ID")}
+function esc(s){return s.replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function val(){return parseInt(($("cair").value||"").replace(/\D/g,""),10)||0}
+function render(){
+  var v=val(),c=$("coret").checked,pc=$("potcek").checked,pv=parseInt(($("pot").value||"").replace(/\D/g,""),10)||0,ad=$("tbhcek").checked?(parseInt(($("tbh").value||"").replace(/\D/g,""),10)||0):0,h="";
+  $("o-cair").textContent=rp(v);
+  $("st").textContent=!v?"":(T[v]?"Sesuai tabel NSC":"Nominal ini tidak ada di tabel NSC, angsuran hanya perkiraan")+(ad?", ditambah Rp "+ad.toLocaleString("id-ID")+" per bulan.":".");
+  var n=$("nama").value.trim(),m=$("motor").value.trim();
+  $("o-cust").innerHTML='<div><span class="lb">Nama konsumen :</span><b>'+esc(n)+'</b></div><div><span class="lb">Type motor :</span><b>'+esc(m)+'</b></div>';
+  tenors.forEach(function(k,i){
+    var a=calc(v,i)+ad;
+    var tn=c?'<span class="bg old">'+k+' Bulan</span><span class="bg">'+(k-1)+' Bulan</span>':'<span class="bg">'+k+' Bulan</span>';
+    var am=pc?'<span class="od">'+rp(a)+'</span><span>'+rp(Math.max(a-pv,0))+'</span>':'<span>'+rp(a)+'</span>';
+    h+='<div class="r"><div class="tn">'+tn+'</div><div class="am">'+am+'</div></div>';
+  });
+  $("rows").innerHTML=h;
+  fit();
+}
+$("cair").addEventListener("input",function(){var d=this.value.replace(/\D/g,"");this.value=d?parseInt(d,10).toLocaleString("id-ID"):"";render()});
+["nama","motor"].forEach(function(i){$(i).addEventListener("input",render)});
+function fit(){
+  var cu=$("o-cust"),cs=16;cu.style.fontSize=cs+"px";
+  while(cu.scrollWidth>cu.clientWidth+1&&cs>8){cs-=0.5;cu.style.fontSize=cs+"px"}
+  var rs=document.querySelectorAll("#rows .r"),m=16,i,s;
+  for(i=0;i<rs.length;i++){s=16;rs[i].style.fontSize=s+"px";while(rs[i].scrollWidth>rs[i].clientWidth+1&&s>7){s-=0.5;rs[i].style.fontSize=s+"px"}if(s<m)m=s}
+  for(i=0;i<rs.length;i++)rs[i].style.fontSize=m+"px";
+}
+$("pot").addEventListener("input",function(){var d=this.value.replace(/\D/g,"");this.value=d?parseInt(d,10).toLocaleString("id-ID"):"";render()});
+$("potcek").addEventListener("change",render);
+$("tbhcek").addEventListener("change",render);
+$("tbh").addEventListener("input",function(){var d=this.value.replace(/\D/g,"");this.value=d?parseInt(d,10).toLocaleString("id-ID"):"";render()});
+window.addEventListener("resize",fit);
+window.addEventListener("load",fit);
+function xmsg(t){$("xm").textContent=t}
+$("exp").addEventListener("click",function(){
+  var b=this;
+  if(!window.html2canvas){xmsg("Butuh koneksi internet untuk export (html2canvas belum termuat).");return}
+  b.disabled=true;xmsg("Membuat gambar...");
+  html2canvas($("sheet"),{scale:3,backgroundColor:"#f8f9fc"}).then(function(c){
+    c.toBlob(function(blob){
+      if(!blob){xmsg("Gagal membuat gambar.");b.disabled=false;return}
+      var n=($("nama").value.trim()||"simulasi").replace(/[^\w\- ]+/g,"").replace(/\s+/g,"_").slice(0,40)||"simulasi";
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="Simulasi_Angsuran_"+n+"_"+val()+".jpg";
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+      xmsg("Gambar tersimpan.");b.disabled=false;
+    },"image/jpeg",0.92);
+  }).catch(function(){xmsg("Gagal membuat gambar.");b.disabled=false});
+});
+$("coret").addEventListener("change",render);
+render();
+</script>
+</body>
+</html>
